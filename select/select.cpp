@@ -7,11 +7,6 @@ int main()
 {
     char buffer[1024];
 
-    struct sockaddr_in server_socket_addr = {
-        .sin_family = AF_INET,
-        .sin_port = htons(11277)};
-    server_socket_addr.sin_addr.s_addr = INADDR_ANY;
-
     int server_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket_fd < 0)
     {
@@ -19,7 +14,12 @@ int main()
         return -1;
     }
 
-    if (bind(server_socket_fd, (const struct sockaddr *)&server_socket_addr, sizeof(server_socket_addr)) < 0)
+    sockaddr_in server_socket_addr = {
+        .sin_family = AF_INET,
+        .sin_port = htons(11277)};
+    server_socket_addr.sin_addr.s_addr = INADDR_ANY;
+
+    if (bind(server_socket_fd, (const sockaddr *)&server_socket_addr, sizeof(server_socket_addr)) < 0)
     {
         std::cerr << "bind failure" << std::endl;
         return -1;
@@ -50,9 +50,9 @@ int main()
 
             if (i == server_socket_fd)
             {
-                struct sockaddr_in client_addr;
+                sockaddr_in client_addr;
                 socklen_t address_len;
-                int client_sock_fd = accept(server_socket_fd, (struct sockaddr *)&client_addr, &address_len);
+                int client_sock_fd = accept(server_socket_fd, (sockaddr *)&client_addr, &address_len);
                 FD_SET(client_sock_fd, &server_fd_set);
 
                 max_fd = std::max(client_sock_fd, max_fd);
